@@ -103,7 +103,8 @@ function odataString(value) {
 }
 
 function buildODataUrl(resource, filter) {
-  const params = new URLSearchParams({ $format: "json", $filter: filter });
+  const params = new URLSearchParams({ $format: "json" });
+  if (String(filter || "").trim()) params.set("$filter", filter);
   return `${V2}/OData/${resource}?${params.toString()}`;
 }
 
