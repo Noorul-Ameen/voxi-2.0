@@ -25,7 +25,9 @@ import { normalizeCustomerFacingText } from "./lib/customerFacingText.js";
 
 const ENV = import.meta.env || {};
 const BASE = String(ENV.VITE_VISTA_BASE || "").replace(/\/+$/, "");
-const USE_MOCK = !BASE;
+const API_ONLY = String(ENV.VITE_API_ONLY || "").toLowerCase() === "true";
+if (API_ONLY && !BASE) throw new Error("VITE_VISTA_BASE is required in API-only mode.");
+const USE_MOCK = !API_ONLY && !BASE;
 const V2 = `${BASE}/vistatickets/vista/v2`;
 const REQUEST_TIMEOUT_MS = 15_000;
 const PROGRAMMING_DAY_START_HOUR = 6;
@@ -435,6 +437,7 @@ export function getVistaCapabilities({ now = new Date() } = {}) {
 }
 
 export function getCinemas({ now = new Date() } = {}) {
+  if (API_ONLY) return [];
   return CINEMAS.map((cinema) => ({
     id: cinema.ID,
     name: normalizeCustomerFacingText(cinema.Name),
@@ -443,6 +446,17 @@ export function getCinemas({ now = new Date() } = {}) {
       ? snapshotDatesForCinema(cinema.ID)
       : getLiveProgrammingDates({ now }),
   }));
+}
+
+export async function loadCinemas({ now = new Date() } = {}) {
+  if (USE_MOCK) return getCinemas({ now });
+  const payload = await requestJson(buildODataUrl("Cinemas"), { operation: "getCinemas" });
+  return payloadArray(payload, "getCinemas").map((cinema) => ({
+    id: String(rawField(cinema, "ID", "Id", "id", "CinemaId", "cinemaId") || ""),
+    name: normalizeCustomerFacingText(rawField(cinema, "Name", "name")),
+    currency: rawField(cinema, "CurrencyCode", "currencyCode") || "AED",
+    availableDates: getLiveProgrammingDates({ now }),
+  })).filter((cinema) => cinema.id && cinema.name);
 }
 
 // Snapshot mode can safely expose its normalized title catalog for local

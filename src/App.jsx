@@ -494,6 +494,7 @@ function newConversationId() {
 
 export default function App() {
   const { locale, dir, t, setLocale, formatCurrency } = useI18n();
+  const [, setCinemaCatalogVersion] = useState(0);
   const [messages, setMessages] = useState([]);
   const [showFullTranscript, setShowFullTranscript] = useState(false);
   const [input, setInput] = useState("");
@@ -508,6 +509,15 @@ export default function App() {
   const [sessionMode, setSessionMode] = useState(null);
   const [startingMode, setStartingMode] = useState(null);
   const [scheduleDate, setScheduleDate] = useState(vista.demoDate);
+  useEffect(() => {
+    let active = true;
+    vista.loadCinemas().then((cinemas) => {
+      if (!active) return;
+      CINEMAS.splice(0, CINEMAS.length, ...cinemas);
+      setCinemaCatalogVersion((version) => version + 1);
+    }).catch((error) => console.error("Cinema directory could not load", error));
+    return () => { active = false; };
+  }, []);
   const appConversationIdRef = useRef(newConversationId());
   const [journey, dispatchJourney] = useReducer(journeyReducer, appConversationIdRef.current, createConversationJourney);
   const [pausedJourney, setPausedJourney] = useState(() => createPausedRichJourney({
