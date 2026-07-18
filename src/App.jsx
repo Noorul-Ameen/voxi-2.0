@@ -4443,7 +4443,7 @@ export default function App() {
         const previousTransportId = transportConversationIdRef.current;
         const handoffJourney = { ...journeyRef.current, locale: activeLocale, transportConversationId: previousTransportId };
         const startedConversationId = await startTransportWithGuards({
-          agentId: import.meta.env.VITE_AGENT_ID,
+          agentId: import.meta.env.VITE_AGENT_ID || "agent_2701kxvmnje2fnf9qfm1fayfc4eb",
           connectionType: "websocket",
           textOnly: true,
           overrides: {
@@ -4556,7 +4556,7 @@ export default function App() {
         const previousTransportId = transportConversationIdRef.current;
         const handoffJourney = { ...journeyRef.current, locale: activeLocale, transportConversationId: previousTransportId };
         const startedConversationId = await startTransportWithGuards({
-          agentId: import.meta.env.VITE_AGENT_ID,
+          agentId: import.meta.env.VITE_AGENT_ID || "agent_2701kxvmnje2fnf9qfm1fayfc4eb",
           connectionType: "webrtc",
           textOnly: false,
           workletPaths: ELEVENLABS_WORKLET_PATHS,

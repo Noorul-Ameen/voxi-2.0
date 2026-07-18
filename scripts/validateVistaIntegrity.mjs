@@ -89,8 +89,8 @@ assert.deepEqual(liveQuotePreview.tiers, { standard: null, premium: null }, "con
 
 const filter = buildProgrammingDateFilter("00'1", "2026-07-14");
 assert.match(filter, /CinemaId eq '00''1'/, "OData string values are escaped");
-assert.match(filter, /2026-07-14T06:00:00Z/);
-assert.match(filter, /2026-07-15T06:00:00Z/);
+assert.match(filter, /datetime'2026-07-14T06:00:00'/);
+assert.match(filter, /datetime'2026-07-15T06:00:00'/);
 
 const fixtureCinema = CINEMAS.find((cinema) => SESSIONS.some((session) => session.CinemaId === cinema.ID));
 assert.ok(fixtureCinema, "the snapshot needs at least one cinema with sessions");

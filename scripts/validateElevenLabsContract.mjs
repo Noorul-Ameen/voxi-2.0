@@ -10,7 +10,6 @@ const contract = JSON.parse(readText("config/elevenlabs-agent-contract.json"));
 const app = readText("src/App.jsx");
 const transport = readText("src/components/ElevenLabsTransport.jsx");
 const journey = readText("src/lib/conversationJourney.js");
-const vite = readText("vite.config.js");
 const environmentExample = readText(".env.example");
 const setupGuide = readText("ELEVENLABS_AGENT_SETUP.md");
 const packageJson = JSON.parse(readText("package.json"));
@@ -107,8 +106,7 @@ assert.match(app, /connectionType:\s*"webrtc"/, "voice must remain on WebRTC");
 assert.match(app, /connectionType:\s*"websocket"/, "text chat must remain on WebSocket");
 assert.match(app, /textOnly:\s*true/, "text chat must remain microphone-free");
 assert.equal((app.match(/agentId:\s*import\.meta\.env\.VITE_AGENT_ID/g) || []).length, 2, "text and voice must both use the configured public agent ID");
-assert.match(vite, new RegExp(`const PUBLIC_AGENT_ID = "${escapeRegExp(EXPECTED_AGENT_ID)}"`));
-assert.match(vite, /env\.VITE_AGENT_ID\s*\|\|\s*PUBLIC_AGENT_ID/, "an empty environment value must fall back to the validated public ID");
+assert.equal((app.match(new RegExp(`import\\.meta\\.env\\.VITE_AGENT_ID \\|\\| "${escapeRegExp(EXPECTED_AGENT_ID)}"`, "g")) || []).length, 2, "an empty environment value must fall back to the validated public ID for text and voice");
 assert.match(environmentExample, /^VITE_AGENT_ID=\s*$/m, ".env.example must not override the valid fallback with a fake nonempty ID");
 
 assert.equal(contract.language.primary, "en");

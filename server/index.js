@@ -51,9 +51,12 @@ app.post("/api/booking/quote", requireVox, asyncRoute(async (req, res) => {
   const ticketResponse = await client.request(`Data/Cinemas/${encodeURIComponent(cinemaId)}/sessions/${encodeURIComponent(sessionId)}/tickets`, {
     query: { salesChannel: config.salesChannel }, correlationId: req.correlationId,
   });
-  const tickets = (ticketResponse?.Tickets || []).filter((ticket) => Number.isFinite(Number(ticket.PriceInCents)));
+  const tickets = (ticketResponse?.Tickets || []).filter((ticket) => Number(ticket.PriceInCents) > 0);
   if (!tickets.length) throw new VoxApiError("No priced ticket type is available.", { status: 409, code: "NO_TICKET_TYPES" });
-  const regular = tickets.slice().sort((a, b) => Number(a.PriceInCents) - Number(b.PriceInCents))[0];
+  const regular = tickets.find((ticket) => /^(?:premium view|standard|adult)(?:\s+2d)?$/i.test(String(ticket.Description || "").trim()))
+    || tickets.filter((ticket) => !/(?:bank|visa|voucher|vchr|comp|spoil|upgrade|package|pkg|kids?|student|birthday|promo|test)/i.test(String(ticket.Description || "")))
+      .sort((a, b) => Number(a.PriceInCents) - Number(b.PriceInCents))[0]
+    || tickets.slice().sort((a, b) => Number(a.PriceInCents) - Number(b.PriceInCents))[0];
   const items = seats.map((seatId) => ({ seatId, amount: Number(regular.PriceInCents) / 100, ticketTypeCode: regular.TicketTypeCode }));
   const subtotal = items.reduce((sum, item) => sum + item.amount, 0);
   res.set("Cache-Control", "no-store").json({

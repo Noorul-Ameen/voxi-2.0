@@ -109,9 +109,12 @@ export function buildProgrammingDateFilter(cinemaId, displayDate) {
   const id = requireText(cinemaId, "cinemaId");
   const date = requireDate(displayDate, "buildProgrammingDateFilter");
   const nextDate = addCalendarDays(date, 1);
-  const start = `${date}T${String(PROGRAMMING_DAY_START_HOUR).padStart(2, "0")}:00:00Z`;
-  const end = `${nextDate}T${String(PROGRAMMING_DAY_START_HOUR).padStart(2, "0")}:00:00Z`;
-  return `CinemaId eq '${odataString(id)}' and Showtime ge ${start} and Showtime lt ${end}`;
+  // Vista's development OData service implements the v3 datetime literal
+  // syntax. Bare ISO timestamps are rejected with HTTP 500 even though they
+  // are valid in newer OData versions.
+  const start = `${date}T${String(PROGRAMMING_DAY_START_HOUR).padStart(2, "0")}:00:00`;
+  const end = `${nextDate}T${String(PROGRAMMING_DAY_START_HOUR).padStart(2, "0")}:00:00`;
+  return `CinemaId eq '${odataString(id)}' and Showtime ge datetime'${start}' and Showtime lt datetime'${end}'`;
 }
 
 async function requestJson(url, {
@@ -770,6 +773,10 @@ function configuredUrl(template, values, operation) {
   const path = Object.entries(values).reduce((result, [key, replacement]) => (
     result.replaceAll(`{${key}}`, encodeURIComponent(String(replacement)))
   ), value);
+  // Root-relative adapters are same-origin application routes, not Vista API
+  // paths. Prefixing them with BASE would incorrectly produce URLs such as
+  // /api/vox/api/booking/quote.
+  if (path.startsWith("/")) return path;
   if (/^https?:\/\//i.test(path)) return path;
   return `${BASE}/${path.replace(/^\/+/, "")}`;
 }
