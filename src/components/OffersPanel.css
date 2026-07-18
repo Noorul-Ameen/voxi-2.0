@@ -1,0 +1,102 @@
+.offers-panel,
+.offers-panel * {
+  box-sizing: border-box;
+}
+
+.offers-panel {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.offers-search-field {
+  min-height: 44px;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.offers-search-field:focus-within {
+  border-color: #006b94 !important;
+  box-shadow: 0 0 0 2px rgb(0 107 148 / 18%);
+}
+
+.offers-search-input:focus-visible {
+  outline: none;
+}
+
+.offer-membership-select,
+.offer-card-select {
+  min-height: 44px;
+}
+
+.offer-row-toggle:focus-visible,
+.offer-detail-summary:focus-visible,
+.offer-profile-summary:focus-visible,
+.offer-footer-summary:focus-visible,
+.offer-official-link:focus-visible,
+.offer-membership-select:focus-visible,
+.offer-card-select:focus-visible,
+.offer-retry-button:focus-visible {
+  border-radius: 7px;
+  outline: 2px solid #005979;
+  outline-offset: 2px;
+}
+
+.offer-row-toggle:focus-visible {
+  outline-offset: -3px;
+}
+
+.offer-detail-summary,
+.offer-profile-summary,
+.offer-footer-summary {
+  min-height: 44px;
+}
+
+.offer-detail-summary::-webkit-details-marker,
+.offer-profile-summary::-webkit-details-marker,
+.offer-footer-summary::-webkit-details-marker {
+  display: none;
+}
+
+.offer-detail-summary::marker,
+.offer-profile-summary::marker,
+.offer-footer-summary::marker {
+  content: "";
+}
+
+.offer-detail-chevron {
+  flex-shrink: 0;
+  transition: transform 150ms ease;
+}
+
+.offer-detail-section[open] > .offer-detail-summary .offer-detail-chevron,
+.offer-profile-card[open] > .offer-profile-summary .offer-detail-chevron {
+  transform: rotate(180deg);
+}
+
+.offer-official-link {
+  min-height: 32px;
+  padding-block: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-underline-offset: 2px;
+}
+
+@media (max-width: 360px) {
+  .offer-membership-control {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .offer-membership-select {
+    max-width: none !important;
+  }
+
+  .offer-campaign-heading {
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .offers-search-field,
+  .offer-detail-chevron {
+    transition: none;
+  }
+}

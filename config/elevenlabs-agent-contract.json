@@ -1,0 +1,362 @@
+{
+  "schemaVersion": "voxi.elevenlabs-agent-contract.v1",
+  "contractVersion": "2026-07-18.1",
+  "publicAgentId": "agent_2701kxvmnje2fnf9qfm1fayfc4eb",
+  "firstMessageTemplate": "{{voxi_session_opening}}",
+  "prompt": {
+    "source": "src/lib/voxiSession.js",
+    "exportName": "VOXI_AGENT_PROMPT",
+    "version": "2026-07-18.1",
+    "hashAlgorithm": "sha256",
+    "hashNormalization": "utf8_lf",
+    "sha256": "8245375a8cde647f9c62e7ee357b67ac4c4f6df08dc1c0a3cc967e2d9ce177b0"
+  },
+  "transport": {
+    "voiceConnectionType": "webrtc",
+    "textConnectionType": "websocket",
+    "textOnly": true,
+    "serverLocation": "eu-residency",
+    "agentLanguageOverride": false,
+    "agentFirstMessageOverride": false
+  },
+  "language": {
+    "primary": "en",
+    "supported": [
+      {
+        "code": "en",
+        "name": "English",
+        "locale": "en-AE"
+      },
+      {
+        "code": "ar",
+        "name": "Arabic",
+        "locale": "ar-AE"
+      }
+    ],
+    "detection": {
+      "policy": "explicit_confirmation_only",
+      "automaticSwitchingAllowed": false,
+      "elevenLabsLanguageDetectionSystemToolEnabled": false,
+      "confirmedSignals": [
+        "visible_language_selector",
+        "direct_language_command",
+        "confirmed_language_prompt"
+      ]
+    }
+  },
+  "dynamicVariables": {
+    "required": [
+      "preferred_language",
+      "voxi_session_id",
+      "voxi_previous_conversation_id",
+      "voxi_is_continuation",
+      "voxi_intent",
+      "voxi_movie",
+      "voxi_cinema",
+      "voxi_booking_progress",
+      "voxi_booking_status",
+      "voxi_performance_date",
+      "voxi_refund_status",
+      "voxi_refund_reference",
+      "voxi_session_opening"
+    ],
+    "dashboardDefaults": {
+      "preferred_language": "English",
+      "voxi_session_id": "not_assigned",
+      "voxi_previous_conversation_id": "none",
+      "voxi_is_continuation": "false",
+      "voxi_intent": "not_yet_known",
+      "voxi_movie": "not_selected",
+      "voxi_cinema": "not_selected",
+      "voxi_booking_progress": "start",
+      "voxi_booking_status": "not_confirmed",
+      "voxi_performance_date": "not_selected",
+      "voxi_refund_status": "not_applicable",
+      "voxi_refund_reference": "not_issued",
+      "voxi_session_opening": "Hi, welcome to VOX Cinemas. I'm Voxi, your AI assistant. How can I help you today?"
+    }
+  },
+  "tools": [
+    {
+      "name": "show_movie_selection",
+      "type": "client",
+      "waitForResponse": true,
+      "description": "Display the cinema picker, the next progressive discovery question, or the movie cards filtered by the retained guest criteria.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cinemaId": {
+            "type": "string",
+            "description": "Exact cinema ID returned by the widget when available."
+          },
+          "cinemaName": {
+            "type": "string",
+            "description": "Spoken or displayed VOX Cinemas UAE location name."
+          },
+          "date": {
+            "type": "string",
+            "description": "Requested programming date as supplied by the guest."
+          },
+          "displayDate": {
+            "type": "string",
+            "description": "Human-readable date wording when no normalized schedule date is available."
+          },
+          "scheduleDate": {
+            "type": "string",
+            "description": "Normalized programming date in YYYY-MM-DD form when known."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "show_showtimes",
+      "type": "client",
+      "waitForResponse": true,
+      "description": "Display current showtimes for one exact movie from the widget's authoritative movie result.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "movieId": {
+            "type": "string",
+            "description": "Exact movie ID returned by show_movie_selection when available."
+          },
+          "movieTitle": {
+            "type": "string",
+            "description": "Exact displayed movie title selected by the guest."
+          },
+          "date": {
+            "type": "string",
+            "description": "Requested programming date as supplied by the guest."
+          },
+          "displayDate": {
+            "type": "string",
+            "description": "Human-readable date wording when no normalized schedule date is available."
+          },
+          "scheduleDate": {
+            "type": "string",
+            "description": "Normalized programming date in YYYY-MM-DD form when known."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "show_seat_map",
+      "type": "client",
+      "waitForResponse": true,
+      "interactionBlocking": false,
+      "description": "Load and display the seat map for one current returned session. Return after the map is ready and never wait for the guest to choose seats.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "movieTitle": {
+            "type": "string",
+            "description": "Exact displayed movie title for the selected session."
+          },
+          "sessionId": {
+            "type": "string",
+            "description": "Exact session ID returned by show_showtimes when available."
+          },
+          "showtime": {
+            "type": "string",
+            "description": "Displayed showtime used only when a unique session ID is not available."
+          },
+          "ticketQuantity": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10,
+            "description": "Optional conversational seat target only. It never creates a quantity stage or determines ticket count, pricing, or checkout."
+          },
+          "date": {
+            "type": "string",
+            "description": "Requested programming date as supplied by the guest."
+          },
+          "displayDate": {
+            "type": "string",
+            "description": "Human-readable date wording when no normalized schedule date is available."
+          },
+          "scheduleDate": {
+            "type": "string",
+            "description": "Normalized programming date in YYYY-MM-DD form when known."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "select_seats",
+      "type": "client",
+      "waitForResponse": true,
+      "description": "Confirm the exact seat labels selected by the guest and display checkout using seat-derived ticket count and pricing.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "seats": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            },
+            "description": "Exact available seat labels, for example E1 and E2."
+          }
+        },
+        "required": [
+          "seats"
+        ]
+      }
+    },
+    {
+      "name": "show_booking_summary",
+      "type": "client",
+      "waitForResponse": true,
+      "description": "Display a known saved or provider-verified booking summary after matching its booking reference.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "movieTitle": {
+            "type": "string",
+            "description": "Movie title associated with the known booking."
+          },
+          "screen": {
+            "type": "string",
+            "description": "Screen associated with the known booking."
+          },
+          "showtime": {
+            "type": "string",
+            "description": "Showtime associated with the known booking."
+          },
+          "seats": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Seat labels associated with the known booking."
+          },
+          "ref": {
+            "type": "string",
+            "description": "Exact booking reference used to find the authoritative stored or active record."
+          },
+          "total": {
+            "type": "number",
+            "description": "Known booking total. The widget still treats its stored record as authoritative."
+          }
+        },
+        "required": [
+          "ref"
+        ]
+      }
+    },
+    {
+      "name": "show_booking_for_cancellation",
+      "type": "client",
+      "waitForResponse": true,
+      "description": "Display current on-device bookings for target selection or continue cancellation for one exact displayed booking reference.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "bookingRef": {
+            "type": "string",
+            "description": "Exact displayed booking reference. Omit it only when the widget must show current bookings for target selection."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "show_offers",
+      "type": "client",
+      "waitForResponse": true,
+      "description": "Show published VOX Cinemas UAE bank-offer guidance using the guest's non-sensitive eligibility details and locally derived booking totals.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "bankName": {
+            "type": "string",
+            "description": "Bank name or alias, for example ENBD, Emirates NBD, FAB, ADCB, or HSBC."
+          },
+          "cardName": {
+            "type": "string",
+            "description": "Exact card product or tier when known, for example Visa Infinite or TouchPoints Platinum. Never request card numbers or payment credentials."
+          },
+          "experience": {
+            "type": "string",
+            "description": "Selected cinema experience, for example STANDARD, IMAX, MAX, 4DX, GOLD, or THEATRE."
+          },
+          "detailTopic": {
+            "type": "string",
+            "enum": [
+              "summary",
+              "cards",
+              "experiences",
+              "limits",
+              "redemption",
+              "exclusions",
+              "terms",
+              "all"
+            ],
+            "description": "Specific offer detail requested by the guest."
+          },
+          "format": {
+            "type": "string",
+            "description": "Selected 2D or 3D format when relevant to the offer."
+          },
+          "seatType": {
+            "type": "string",
+            "description": "Selected non-sensitive seat category, for example REGULAR, PREFERRED, PREMIUM, SAPPHIRE, or BALCONY."
+          },
+          "isMember": {
+            "type": "boolean",
+            "description": "Whether the guest confirms they are logged in as a VOX member."
+          },
+          "monthlyTicketsUsed": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Guest-provided count of offer tickets already used this month when the published limit requires it."
+          },
+          "monthlySpend": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Guest-provided monthly retail spend in AED when the published card rule requires it."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "handover_to_agent",
+      "type": "client",
+      "waitForResponse": true,
+      "description": "Prepare a safe VOX Customer Care handover for an explicit human request or after two genuine failed clarifications.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "type": "string",
+            "enum": [
+              "explicit_request",
+              "clarification_failure",
+              "fallback"
+            ],
+            "description": "Approved reason for preparing the handover."
+          },
+          "detail": {
+            "type": "string",
+            "description": "Short non-sensitive explanation of the unresolved request. Never include payment or card details."
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      }
+    }
+  ]
+}

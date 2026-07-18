@@ -1,0 +1,30 @@
+node_modules/
+dist/
+coverage/
+.wrangler/
+.next/
+
+# Local Vite environment files may contain real credentials.
+.env
+.env.*
+!.env.example
+
+*.local
+*.log
+*.pem
+*.key
+*.p12
+*.pfx
+.DS_Store
+__pycache__/
+*.py[cod]
+
+# Transactional showtime-refresh work files.
+data/.vox_showtimes_full.next-*.json
+data/.vox_showtimes_full.backup-*.json
+src/.mockVistaData.next-*.js
+src/.mockVistaData.backup-*.js
+src/generated/.voxSnapshotManifest.next-*.js
+src/generated/.voxSnapshotManifest.backup-*.js
+public/data/.vox-snapshot.next-*/
+public/data/.vox-snapshot.backup-*/

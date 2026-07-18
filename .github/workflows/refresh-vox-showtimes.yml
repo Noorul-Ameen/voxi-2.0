@@ -1,0 +1,56 @@
+name: Refresh VOX UAE showtimes
+
+on:
+  schedule:
+    - cron: "30 1 * * *"
+    - cron: "30 6 * * 4"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: vox-uae-showtime-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    name: Extract, validate, and publish
+    runs-on: ${{ vars.VOX_REFRESH_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 25
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Refresh from official VOX UAE availability
+        run: npm run refresh:data
+
+      - name: Commit generated schedule when changed
+        shell: bash
+        run: |
+          if git diff --quiet -- data/vox_showtimes_full.json src/mockVistaData.js src/generated/voxSnapshotManifest.js public/data/vox-snapshot; then
+            echo "VOX has not published a schedule change."
+            exit 0
+          fi
+          git config user.name "VOXi Showtimes Bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/vox_showtimes_full.json src/mockVistaData.js src/generated/voxSnapshotManifest.js public/data/vox-snapshot
+          git commit -m "Refresh VOX UAE showtimes"
+          git push origin HEAD:main

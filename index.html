@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voxi | VOX Cinemas UAE</title>
+    <script>
+      try {
+        const locale = localStorage.getItem("vox_locale") === "ar" ? "ar" : "en";
+        document.documentElement.lang = locale;
+        document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
+      } catch {}
+    </script>
+    <style>
+      * { box-sizing: border-box; }
+      html, body, #root { height: 100%; margin: 0; }
+      body {
+        background: #f4f9fc;
+        color: #102a3a;
+        color-scheme: light;
+        font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+      }
+      .startup-shell {
+        width: min(100%, 420px);
+        min-height: 100%;
+        margin: 0 auto;
+        background: #ffffff;
+        box-shadow: 0 18px 48px rgba(16, 42, 58, 0.18);
+      }
+      .startup-header {
+        min-height: 72px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 18px;
+        color: #ffffff;
+        background: linear-gradient(135deg, #006b94, #009ddb);
+      }
+      .startup-mark {
+        width: 40px;
+        height: 40px;
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+        border: 2px solid rgba(255, 255, 255, 0.86);
+        border-radius: 50%;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+      }
+      .startup-brand { font-size: 18px; font-weight: 800; }
+      .startup-subtitle { margin-top: 2px; font-size: 12px; opacity: 0.86; }
+      .startup-body { padding: 22px 18px; }
+      .startup-status { margin: 0 0 18px; color: #526a78; font-size: 14px; }
+      .startup-card {
+        height: 92px;
+        margin-bottom: 12px;
+        border: 1px solid #c9dfe8;
+        border-radius: 14px;
+        background: linear-gradient(100deg, #eef6f9 20%, #f8fcfd 38%, #eef6f9 56%);
+        background-size: 220% 100%;
+        animation: startup-shimmer 1.4s ease-in-out infinite;
+      }
+      .startup-card:last-child { width: 76%; height: 54px; }
+      .startup-ar { display: none; }
+      html[dir="rtl"] .startup-en { display: none; }
+      html[dir="rtl"] .startup-ar { display: inline; }
+      @keyframes startup-shimmer {
+        from { background-position: 100% 0; }
+        to { background-position: -100% 0; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .startup-card { animation: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div class="startup-shell" role="status" aria-live="polite" aria-label="Loading Voxi">
+        <div class="startup-header">
+          <div class="startup-mark" aria-hidden="true">VOX</div>
+          <div>
+            <div class="startup-brand">Voxi</div>
+            <div class="startup-subtitle">
+              <span class="startup-en">VOX Cinemas UAE</span>
+              <span class="startup-ar" lang="ar">فوكس سينما الإمارات</span>
+            </div>
+          </div>
+        </div>
+        <div class="startup-body">
+          <p class="startup-status">
+            <span class="startup-en">Loading your cinema concierge...</span>
+            <span class="startup-ar" lang="ar">جار تجهيز مساعد السينما...</span>
+          </p>
+          <div class="startup-card" aria-hidden="true"></div>
+          <div class="startup-card" aria-hidden="true"></div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
