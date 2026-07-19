@@ -285,8 +285,18 @@ function explicitClears(text) {
   if (/\b(?:any language|no language preference)\b|اي لغة|أي لغة/.test(text)) clear.add("language");
   if (/\b(?:any (?:format|experience)|regular is fine|no (?:format|experience) preference)\b|اي تجربة|أي تجربة/.test(text)) clear.add("experience");
   if (/\b(?:any movie|another movie|other movies|something else)\b|فيلم آخر|فيلم اخر/.test(text)) ["movieId", "movieTitle"].forEach((key) => clear.add(key));
+  if (isOpenEndedDiscoveryRequest(text)) {
+    ["movieId", "movieTitle", "preferredTime", "timeBand", "genre", "language", "experience", "audience"]
+      .forEach((key) => clear.add(key));
+  }
   if (/\b(?:not for kids|no kids)\b|ليس للاطفال|مش للاطفال/.test(text)) clear.add("audience");
   return clear;
+}
+
+export function isOpenEndedDiscoveryRequest(input) {
+  const text = normalizeText(input);
+  return /^(?:any(?:thing| movie)?(?: is fine)?|whatever(?: is fine)?|anything works|no preference|surprise me|recommend (?:anything|something|a movie)|suggest (?:anything|something|a movie)|show (?:me )?(?:anything|any movie|all movies))$/iu.test(text)
+    || /^(?:أي شيء|اي شيء|أي فيلم|اي فيلم|لا فرق|اقترح أي شيء|اقترح اي شيء)$/iu.test(text);
 }
 
 export function createDiscoveryPreferences(seed = {}) {

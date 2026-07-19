@@ -4,6 +4,7 @@ import {
   extractDiscoveryPreferencePatch,
   filterDiscoveryResults,
   getMissingDiscoveryCriteria,
+  isOpenEndedDiscoveryRequest,
   mergeDiscoveryPreferences,
   parseAndMergeDiscoveryPreferences,
   resolveDiscoveryMovieCandidate,
@@ -17,6 +18,15 @@ import {
 } from "../src/lib/discoveryResultContext.js";
 
 const NOW = new Date("2026-07-14T08:00:00Z");
+
+for (const phrase of ["anything", "anything is fine", "whatever", "any movie", "surprise me", "recommend something"]) {
+  assert.equal(isOpenEndedDiscoveryRequest(phrase), true, `open-ended discovery must accept: ${phrase}`);
+  const signal = extractDiscoveryPreferencePatch(phrase, { now: NOW });
+  for (const key of ["movieId", "movieTitle", "preferredTime", "timeBand", "genre", "language", "experience", "audience"]) {
+    assert.ok(signal.clear.includes(key), `${phrase} must clear stale ${key}`);
+  }
+}
+assert.equal(isOpenEndedDiscoveryRequest("any time"), false, "any time must clear only the time preference");
 const cinemas = [
   { id: "0002", name: "Mall of the Emirates", city: "Dubai" },
   { id: "0012", name: "Yas Mall", city: "Abu Dhabi" },

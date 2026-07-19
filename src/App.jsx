@@ -40,7 +40,7 @@ import {
   selectRestorableRichStage,
 } from "./lib/pausedRichJourney.js";
 import { isResumeCheckoutTurn, isResumeOnlyTurn, pausedResumeTarget } from "./lib/pausedJourneyRouting.js";
-import { createDiscoveryPreferences, extractDiscoveryPreferencePatch, filterDiscoveryResults, getMissingDiscoveryCriteria, mergeDiscoveryPreferences, parseAndMergeDiscoveryPreferences, resolveDiscoveryMovieCandidate, shouldTreatAsDiscoveryFilterTurn, unresolvedMovieTitleCandidate } from "./lib/discoveryPreferences.js";
+import { createDiscoveryPreferences, extractDiscoveryPreferencePatch, filterDiscoveryResults, getMissingDiscoveryCriteria, isOpenEndedDiscoveryRequest, mergeDiscoveryPreferences, parseAndMergeDiscoveryPreferences, resolveDiscoveryMovieCandidate, shouldTreatAsDiscoveryFilterTurn, unresolvedMovieTitleCandidate } from "./lib/discoveryPreferences.js";
 import { buildAuthoritativeDiscoveryContext, buildMovieSelectionGroundingContext } from "./lib/discoveryResultContext.js";
 import { normalizeSeatIds, resolveSeatSelectionTurn, resolveSeatToolInput } from "./lib/seatRouting.js";
 import { filterBookableSessions } from "./lib/showtimeAvailability.js";
@@ -1378,7 +1378,7 @@ export default function App() {
       }
     }
     const freshMissing = discoveryMissingCriteria(preferences);
-    if (freshMissing.includes("preference")) {
+    if (freshMissing.includes("preference") && !isOpenEndedDiscoveryRequest(rawTurn)) {
       pendingDiscoveryTurnRef.current = "";
       return showDiscoveryPrompt(["preference"], preferences);
     }
@@ -1483,6 +1483,7 @@ export default function App() {
 
   const routeDiscoveryTurn = async (text, { cinemaOverride = null, dateOverride = null, preferencesAlreadyApplied = false } = {}) => {
     const rawTurn = String(text || "").trim();
+    const acceptsAnyMovie = isOpenEndedDiscoveryRequest(rawTurn);
     const rawPreferencePatch = extractDiscoveryPreferencePatch(rawTurn, {
       cinemas: CINEMAS,
       movies: [...DISCOVERY_MOVIE_CATALOG, ...filmsRef.current].filter(Boolean),
@@ -1589,7 +1590,7 @@ export default function App() {
       return { shown: false, reason: `No published programming is available for ${preferences.date}.`, availableDates };
     }
     if (preferences.date !== scheduleDateRef.current) applyProgrammingDate(preferences.date, "discovery_date_changed", availableDates);
-    if (missing.includes("preference") && !pendingDiscoveryTurnRef.current) return showDiscoveryPrompt(missing.filter((item) => item === "preference"), preferences);
+    if (missing.includes("preference") && !pendingDiscoveryTurnRef.current && !acceptsAnyMovie) return showDiscoveryPrompt(missing.filter((item) => item === "preference"), preferences);
     const result = await loadDiscoveryForCinema(target, preferences.date, preferences, combinedRawTurn);
     if (discoveryPreferencesRef.current.movieId || discoveryPreferencesRef.current.movieTitle) pendingDiscoveryTurnRef.current = "";
     return result;
