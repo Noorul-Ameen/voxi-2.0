@@ -664,7 +664,6 @@ function normalizeSession(session, displayDate) {
     availabilityVerified: !USE_MOCK,
     dataMode: USE_MOCK ? "snapshot" : "live",
     duplicateCount: 0,
-    scheduledFilmId: String(rawField(session, "ScheduledFilmId", "scheduledFilmId") || ""),
   };
 }
 

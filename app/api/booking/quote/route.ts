@@ -2,8 +2,10 @@ import { loadConfig } from "../../../../server/config.js";
 import { VoxApiError, VoxClient } from "../../../../server/vox-client.js";
 
 export const runtime = "edge";
+const config = loadConfig({ requireCredentials: false });
+const client = new VoxClient(config);
+
 export async function POST(request: Request) {
-  const config = loadConfig({ requireCredentials: false });
   const correlationId = String(request.headers.get("x-correlation-id") || crypto.randomUUID()).slice(0, 128);
   try {
     const body = await request.json() as any;
@@ -11,7 +13,6 @@ export async function POST(request: Request) {
     const sessionId = String(body?.SessionId || "").trim();
     const seats = Array.isArray(body?.Seats) ? body.Seats.map(String) : [];
     if (!cinemaId || !sessionId || !seats.length) return Response.json({ code: "INVALID_QUOTE_REQUEST" }, { status: 400 });
-    const client = new VoxClient(config);
     const ticketResponse: any = await client.request(`Data/Cinemas/${encodeURIComponent(cinemaId)}/sessions/${encodeURIComponent(sessionId)}/tickets`, { query: { salesChannel: config.salesChannel }, correlationId });
     const tickets = (ticketResponse?.Tickets || []).filter((ticket: any) => Number(ticket.PriceInCents) > 0);
     if (!tickets.length) throw new VoxApiError("No priced ticket type is available.", { status: 409, code: "NO_TICKET_TYPES" });

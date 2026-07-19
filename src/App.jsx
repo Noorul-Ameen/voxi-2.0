@@ -1276,7 +1276,9 @@ export default function App() {
     const barePreferenceReply = stageRef.current.view === "discovery"
       && stageRef.current.missing?.[0] === "preference"
       && String(text || "").trim().split(/\s+/).length >= 1;
-    return signal.hasDiscoverySignal || genericRequest || datePromptReply || barePreferenceReply;
+    const openEndedFollowup = isOpenEndedDiscoveryRequest(text)
+      && Boolean(cinemaRef.current || discoveryPreferencesRef.current.cinemaId);
+    return signal.hasDiscoverySignal || genericRequest || datePromptReply || barePreferenceReply || openEndedFollowup;
   };
 
   const isDiscoveryFilterTurn = (text) => {
