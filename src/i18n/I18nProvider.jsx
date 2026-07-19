@@ -4,7 +4,7 @@ import { STRINGS } from "./strings.js";
 const STORAGE_KEY = "vox_locale";
 const I18nContext = createContext(null);
 
-function initialLocale() {
+function storedLocale() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === "en" || stored === "ar") return stored;
@@ -20,8 +20,15 @@ function interpolate(value, vars) {
 }
 
 export function I18nProvider({ children }) {
-  const [locale, setLocaleState] = useState(initialLocale);
+  // Keep the first client render identical to SSR. Reading localStorage in the
+  // state initializer makes a persisted Arabic session hydrate English HTML
+  // with Arabic text, which React correctly reports as a mismatch.
+  const [locale, setLocaleState] = useState("en");
   const dir = locale === "ar" ? "rtl" : "ltr";
+
+  useEffect(() => {
+    setLocaleState(storedLocale());
+  }, []);
 
   const setLocale = (next) => {
     const safe = next === "ar" ? "ar" : "en";

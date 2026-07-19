@@ -7,6 +7,7 @@ const rich = fs.readFileSync(new URL("../src/components/RichMedia.jsx", import.m
 const main = fs.readFileSync(new URL("../src/main.jsx", import.meta.url), "utf8");
 const fuzzy = fs.readFileSync(new URL("../src/lib/fuzzyResolvers.js", import.meta.url), "utf8");
 const vista = fs.readFileSync(new URL("../src/vistaClient.js", import.meta.url), "utf8");
+const i18nProvider = fs.readFileSync(new URL("../src/i18n/I18nProvider.jsx", import.meta.url), "utf8");
 
 const originalTools = [
   "show_movie_selection",
@@ -44,6 +45,8 @@ assert.doesNotMatch(app.slice(app.indexOf("const selectHistoryBooking"), app.ind
 assert.match(rich, /dir="ltr"/);
 assert.match(main, /class ErrorBoundary/);
 assert.match(main, /<I18nProvider>/);
+assert.match(i18nProvider, /useState\("en"\)/, "the initial client locale must match the English server render");
+assert.match(i18nProvider, /useEffect\(\(\) => \{\s*setLocaleState\(storedLocale\(\)\)/, "the persisted locale must be restored only after hydration");
 assert.match(vista, /requestedRef\.toUpperCase\(\) !== String\(BOOKING\.BookingId\)\.toUpperCase\(\)/, "unknown demo booking references must not resolve to the fixture");
 
 console.log("Validated protected ElevenLabs, tool, fuzzy-resolution, error-boundary, RTL-seat, and 420px invariants.");
